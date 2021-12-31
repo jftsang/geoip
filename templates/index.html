@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <script>
+            async function locationSuccess(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                const altitude = position.coords.altitude;
+                const accuracy = position.coords.accuracy;
+                const altitudeAccuracy = position.coords.altitudeAccuracy;
+                const heading = position.coords.height;
+                const speed = position.coords.speed;
+                const timestamp = position.timestamp;
+
+                const url = "{{ url_for('report_position_view') }}";
+
+                const data = {
+                    latitude: latitude,
+                    longitude: longitude,
+                    altitude: altitude,
+                    timestamp: timestamp,
+                };
+
+                const options = {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                };
+
+
+                try {
+                    const resp = await fetch(url, options);
+                    const data = await resp.json();
+
+                    const elem = document.getElementById("location_para");
+                    elem.innerHTML = data['latitude'] + ", " + data['longitude'];
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }
+
+            function locationError(error) {
+                const code = error.code;
+                const message = error.message;
+            }
+
+            navigator.geolocation.watchPosition(locationSuccess, locationError); 
+            /*
+            const interval = setInterval(
+                () => {
+                    navigator.geolocation.getCurrentPosition(
+                        locationSuccess, locationError
+                    );
+                },
+                1000
+            )
+            */
+        </script>
+
+    </head>
+
+    <body>
+        <p id="location_para">
+
+        </p>
+
+    </body>
+</html>
